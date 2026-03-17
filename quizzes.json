@@ -1,0 +1,366 @@
+{
+  "App de Incidencias": {
+    "preguntas": [
+      {
+        "pregunta": "¿Cuál es la función principal de la App de Incidencias?",
+        "opciones": [
+          "Gestionar el personal administrativo",
+          "Registrar y gestionar incidentes operativos en tiempo real",
+          "Monitorear cámaras de seguridad",
+          "Controlar el acceso al edificio"
+        ],
+        "correcta": 1,
+        "explicacion": "La App de Incidencias está diseñada para el registro y gestión de incidentes operativos en tiempo real."
+      },
+      {
+        "pregunta": "¿Qué tipo de eventos registra principalmente la App de Incidencias?",
+        "opciones": [
+          "Solicitudes de vacaciones del personal",
+          "Facturas y gastos administrativos",
+          "Incidentes operativos en el campo",
+          "Horarios de reuniones"
+        ],
+        "correcta": 2,
+        "explicacion": "La plataforma está orientada a los incidentes que ocurren durante las operaciones en campo."
+      }
+    ]
+  },
+  "Sistema de Validación": {
+    "preguntas": [
+      {
+        "pregunta": "¿Qué permite hacer el Sistema de Validación?",
+        "opciones": [
+          "Monitorear cámaras en tiempo real",
+          "Registrar incidencias de campo",
+          "Validar personal y controlar accesos institucionales",
+          "Gestionar el inventario de equipos"
+        ],
+        "correcta": 2,
+        "explicacion": "El Sistema de Validación está enfocado en la validación de personal y el control de accesos institucionales."
+      },
+      {
+        "pregunta": "¿A quién beneficia principalmente el Sistema de Validación?",
+        "opciones": [
+          "Solo al personal de seguridad perimetral",
+          "Al personal encargado del control de accesos",
+          "Solo a los supervisores de turno",
+          "Al área de comunicaciones"
+        ],
+        "correcta": 1,
+        "explicacion": "El sistema está diseñado para el personal responsable del control de accesos."
+      }
+    ]
+  },
+  "Sistema de Cazadores": {
+    "preguntas": [
+      {
+        "pregunta": "¿Para qué sirve el Sistema de Cazadores?",
+        "opciones": [
+          "Administrar el personal administrativo",
+          "Gestionar cámaras vecinales",
+          "Seguimiento y control de operativos en campo",
+          "Monitorear vehículos detenidos"
+        ],
+        "correcta": 2,
+        "explicacion": "El Sistema de Cazadores es una plataforma de seguimiento y control de operativos en campo."
+      },
+      {
+        "pregunta": "¿Qué información gestiona principalmente el Sistema de Cazadores?",
+        "opciones": [
+          "Datos administrativos del personal",
+          "Inventario de dispositivos tecnológicos",
+          "Operativos de campo en tiempo real",
+          "Registros históricos de incidencias"
+        ],
+        "correcta": 2,
+        "explicacion": "El sistema gestiona operativos de campo de manera dinámica y en tiempo real."
+      }
+    ]
+  },
+  "Mapa CECOM": {
+    "preguntas": [
+      {
+        "pregunta": "¿Cuántas cámaras municipales visualiza el Mapa CECOM?",
+        "opciones": [
+          "411 cámaras",
+          "511 cámaras",
+          "611 cámaras",
+          "711 cámaras"
+        ],
+        "correcta": 2,
+        "explicacion": "El Mapa CECOM visualiza geográficamente las 611 cámaras municipales activas."
+      },
+      {
+        "pregunta": "¿Qué tipo de plataforma es el Mapa CECOM?",
+        "opciones": [
+          "Sistema de gestión de incidencias",
+          "Plataforma de visualización geográfica de cámaras",
+          "Sistema de control de accesos",
+          "Plataforma de gestión de personal"
+        ],
+        "correcta": 1,
+        "explicacion": "El Mapa CECOM es una plataforma de visualización geográfica de las cámaras municipales."
+      }
+    ]
+  },
+  "Gestionate": {
+    "preguntas": [
+      {
+        "pregunta": "¿Qué gestiona la plataforma Gestionate?",
+        "opciones": [
+          "El monitoreo de cámaras de seguridad",
+          "Los operativos de campo en tiempo real",
+          "La administración del personal municipal",
+          "Las alertas de seguridad"
+        ],
+        "correcta": 2,
+        "explicacion": "Gestionate es el sistema de gestión administrativa del personal municipal."
+      },
+      {
+        "pregunta": "¿A qué área de CECOM beneficia principalmente Gestionate?",
+        "opciones": [
+          "Al área operativa de campo",
+          "Al área de monitoreo",
+          "Al área de comunicaciones",
+          "Al área administrativa"
+        ],
+        "correcta": 3,
+        "explicacion": "Gestionate está orientado a las tareas administrativas del personal municipal."
+      }
+    ]
+  },
+  "Centinela": {
+    "preguntas": [
+      {
+        "pregunta": "¿Cuál es la función de la plataforma Centinela?",
+        "opciones": [
+          "Gestión de personal administrativo",
+          "Monitoreo y generación de alertas de seguridad",
+          "Control de accesos al edificio",
+          "Registro de incidentes operativos"
+        ],
+        "correcta": 1,
+        "explicacion": "Centinela es una plataforma de monitoreo y generación de alertas de seguridad."
+      },
+      {
+        "pregunta": "¿Qué tipo de alertas genera la plataforma Centinela?",
+        "opciones": [
+          "Alertas de mantenimiento de equipos",
+          "Alertas de recursos humanos",
+          "Alertas de seguridad",
+          "Alertas de inventario"
+        ],
+        "correcta": 2,
+        "explicacion": "Centinela genera alertas enfocadas en la seguridad del municipio."
+      }
+    ]
+  },
+  "Hikvision WebClient": {
+    "preguntas": [
+      {
+        "pregunta": "¿Qué permite hacer Hikvision WebClient?",
+        "opciones": [
+          "Gestionar el personal de seguridad",
+          "Acceder a las cámaras Hikvision desde el navegador web",
+          "Registrar incidencias de campo",
+          "Controlar el acceso a instalaciones"
+        ],
+        "correcta": 1,
+        "explicacion": "Hikvision WebClient permite el acceso web a las cámaras Hikvision desde cualquier navegador."
+      },
+      {
+        "pregunta": "¿Cuál es la principal ventaja de Hikvision WebClient frente al software de escritorio?",
+        "opciones": [
+          "Ofrece más funciones avanzadas",
+          "No requiere instalación de software adicional",
+          "Solo funciona en Windows",
+          "Permite gestionar más cámaras simultáneamente"
+        ],
+        "correcta": 1,
+        "explicacion": "La ventaja de WebClient es que no requiere instalar software: se accede directamente desde el navegador."
+      }
+    ]
+  },
+  "HikCentral Professional": {
+    "preguntas": [
+      {
+        "pregunta": "¿Cómo se accede a HikCentral Professional?",
+        "opciones": [
+          "Desde cualquier navegador web",
+          "Solo desde dispositivos móviles",
+          "Desde una aplicación de escritorio",
+          "Desde una consola de comandos"
+        ],
+        "correcta": 2,
+        "explicacion": "HikCentral Professional es una plataforma de escritorio que requiere instalación en el equipo."
+      },
+      {
+        "pregunta": "¿Para qué tipo de gestión de cámaras está diseñado HikCentral Professional?",
+        "opciones": [
+          "Gestión básica para usuarios ocasionales",
+          "Gestión avanzada y profesional de cámaras Hikvision",
+          "Solo para visualización de cámaras vecinales",
+          "Gestión de cámaras corporales"
+        ],
+        "correcta": 1,
+        "explicacion": "HikCentral Professional está diseñado para la gestión avanzada y profesional de cámaras Hikvision."
+      }
+    ]
+  },
+  "IVMS-4200": {
+    "preguntas": [
+      {
+        "pregunta": "¿Para qué tipo de cámaras está diseñado IVMS-4200?",
+        "opciones": [
+          "Cámaras institucionales de alta seguridad",
+          "Cámaras corporales de agentes",
+          "Cámaras vecinales",
+          "Cámaras de tráfico"
+        ],
+        "correcta": 2,
+        "explicacion": "IVMS-4200 es la plataforma para la gestión y monitoreo de cámaras vecinales."
+      },
+      {
+        "pregunta": "¿Qué función cumple IVMS-4200 en CECOM?",
+        "opciones": [
+          "Registro de incidentes administrativos",
+          "Gestión y monitoreo de cámaras vecinales",
+          "Control de acceso al edificio",
+          "Rastreo de unidades municipales"
+        ],
+        "correcta": 1,
+        "explicacion": "IVMS-4200 se usa para la gestión y monitoreo de las cámaras vecinales del municipio."
+      }
+    ]
+  },
+  "SmartPSS": {
+    "preguntas": [
+      {
+        "pregunta": "¿De qué fabricante es la plataforma SmartPSS?",
+        "opciones": [
+          "Hikvision",
+          "Axis",
+          "Dahua",
+          "Bosch"
+        ],
+        "correcta": 2,
+        "explicacion": "SmartPSS es la plataforma de escritorio de Dahua para monitoreo y gestión de dispositivos."
+      },
+      {
+        "pregunta": "¿Qué permite hacer SmartPSS?",
+        "opciones": [
+          "Gestionar solicitudes administrativas",
+          "Registrar incidencias operativas",
+          "Monitoreo y gestión de dispositivos Dahua",
+          "Control de accesos institucionales"
+        ],
+        "correcta": 2,
+        "explicacion": "SmartPSS es la solución de escritorio de Dahua para el monitoreo y la gestión de sus dispositivos."
+      }
+    ]
+  },
+  "PUC": {
+    "preguntas": [
+      {
+        "pregunta": "¿Qué significa PUC en el contexto de CECOM?",
+        "opciones": [
+          "Plataforma Única de Control",
+          "Plataforma Unificada de Control",
+          "Panel Unificado de Comunicaciones",
+          "Portal Único de Coordinación"
+        ],
+        "correcta": 1,
+        "explicacion": "PUC significa Plataforma Unificada de Control, utilizada para la gestión centralizada."
+      },
+      {
+        "pregunta": "¿Cuál es el objetivo principal del PUC?",
+        "opciones": [
+          "Registrar incidentes de campo",
+          "Validar el acceso del personal",
+          "Gestión centralizada de operaciones",
+          "Monitorear cámaras vecinales"
+        ],
+        "correcta": 2,
+        "explicacion": "El PUC está diseñado para la gestión centralizada de las operaciones de CECOM."
+      }
+    ]
+  },
+  "Geosatelital": {
+    "preguntas": [
+      {
+        "pregunta": "¿Qué rastrea el sistema Geosatelital?",
+        "opciones": [
+          "La ubicación de las cámaras fijas del municipio",
+          "El estado de las incidencias registradas",
+          "Las unidades municipales en tiempo real",
+          "Los accesos del personal al edificio"
+        ],
+        "correcta": 2,
+        "explicacion": "Geosatelital es el sistema de rastreo satelital de unidades municipales en tiempo real."
+      },
+      {
+        "pregunta": "¿Qué tecnología usa Geosatelital para el rastreo?",
+        "opciones": [
+          "Cámaras fijas en la vía pública",
+          "Tecnología satelital (GPS)",
+          "Sensores de movimiento en las calles",
+          "Redes de comunicación radial"
+        ],
+        "correcta": 1,
+        "explicacion": "Geosatelital utiliza tecnología satelital para el rastreo de las unidades municipales."
+      }
+    ]
+  },
+  "Radio Dolphin": {
+    "preguntas": [
+      {
+        "pregunta": "¿Quién usa principalmente la Radio Dolphin?",
+        "opciones": [
+          "El personal administrativo en oficina",
+          "Los supervisores en reuniones",
+          "El personal operativo en campo",
+          "Los técnicos de mantenimiento"
+        ],
+        "correcta": 2,
+        "explicacion": "La Radio Dolphin es el dispositivo de comunicación utilizado por el personal operativo en campo."
+      },
+      {
+        "pregunta": "¿Para qué sirve la Radio Dolphin?",
+        "opciones": [
+          "Para el rastreo satelital de unidades",
+          "Para la comunicación entre el personal operativo",
+          "Para la grabación de incidentes en campo",
+          "Para el monitoreo de cámaras remotas"
+        ],
+        "correcta": 1,
+        "explicacion": "La Radio Dolphin facilita la comunicación entre el personal operativo durante sus actividades en campo."
+      }
+    ]
+  },
+  "Bodycam": {
+    "preguntas": [
+      {
+        "pregunta": "¿Cuándo se usa la Bodycam?",
+        "opciones": [
+          "Solo durante reuniones administrativas",
+          "En el monitoreo desde la sala de control",
+          "Durante operativos en campo",
+          "Solo en situaciones de emergencia declarada"
+        ],
+        "correcta": 2,
+        "explicacion": "La Bodycam es utilizada por los agentes durante sus operativos en campo."
+      },
+      {
+        "pregunta": "¿Qué registra la Bodycam?",
+        "opciones": [
+          "Las comunicaciones radiales del personal",
+          "Los datos de rastreo satelital",
+          "Las acciones de los agentes durante operativos",
+          "Las imágenes de las cámaras fijas"
+        ],
+        "correcta": 2,
+        "explicacion": "La Bodycam registra en video las acciones de los agentes mientras realizan operativos en campo."
+      }
+    ]
+  }
+}

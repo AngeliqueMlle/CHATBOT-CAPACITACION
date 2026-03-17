@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asistente CECOM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    :root {
+      --bg:           #ECF0F6;
+      --surface:      #FFFFFF;
+      --surface-2:    #E4E9F2;
+      --border:       #D0D7E4;
+      --shadow-sm:    0 1px 3px rgba(13,24,52,0.08), 0 1px 2px rgba(13,24,52,0.04);
+      --shadow-md:    0 4px 12px rgba(13,24,52,0.10), 0 1px 3px rgba(13,24,52,0.06);
+      --primary:      #0D1834;
+      --primary-mid:  #1A3A6C;
+      --primary-glow: rgba(26, 58, 108, 0.08);
+      --action:       #1E54D0;
+      --action-hover: #1643B0;
+      --action-dim:   rgba(30, 84, 208, 0.10);
+      --text:         #0D1421;
+      --text-dim:     #4A5670;
+      --text-muted:   #8E97AC;
+      --green:        #0D9F6E;
+      --card-accent:  #1E54D0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    header {
+      width: 100%;
+      background: var(--primary);
+      padding: 0 20px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(13,24,52,0.25);
+    }
+
+    .header-logo {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-logo svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .header-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .header-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .header-subtitle {
+      font-size: 0.68rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.02em;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 6px;
+    }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      background: #34D399;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: pulse-dot 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; box-shadow: 0 0 5px #34D399; }
+      50%       { opacity: 0.4; box-shadow: none; }
+    }
+
+    #btnInicio {
+      margin-left: auto;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.20);
+      color: rgba(255,255,255,0.80);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+      display: none;
+    }
+    #btnInicio:hover {
+      background: rgba(255,255,255,0.18);
+      color: #FFFFFF;
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    /* ── Chat container ──────────────────────────────────── */
+    .chat-container {
+      width: 100%;
+      max-width: 720px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      scroll-behavior: smooth;
+    }
+
+    #messages::-webkit-scrollbar { width: 3px; }
+    #messages::-webkit-scrollbar-track { background: transparent; }
+    #messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Bubbles ─────────────────────────────────────────── */
+    .bubble {
+      max-width: 78%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      line-height: 1.6;
+      font-size: 0.91rem;
+      word-break: break-word;
+      white-space: pre-wrap;
+      animation: slide-in 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .bubble.bot {
+      background: var(--surface);
+      color: var(--text);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      box-shadow: var(--shadow-sm);
+    }
+    .bubble.user {
+      background: var(--primary-mid);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Typing indicator ────────────────────────────────── */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 11px 15px;
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+      animation: slide-in 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+    .typing-indicator span {
+      width: 5px;
+      height: 5px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      animation: typing-bounce 1.3s ease-in-out infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.18s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.36s; }
+
+    @keyframes typing-bounce {
+      0%, 55%, 100% { transform: translateY(0);    opacity: 0.35; }
+      28%            { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ── Buttons ─────────────────────────────────────────── */
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 2px 0 2px 2px;
+      align-self: flex-start;
+      max-width: 92%;
+      animation: slide-in 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+
+    .chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--action);
+      border-radius: 8px;
+      padding: 6px 13px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+      box-shadow: var(--shadow-sm);
+    }
+    .chip:hover {
+      background: var(--action);
+      border-color: var(--action);
+      color: #FFFFFF;
+      box-shadow: var(--shadow-md);
+    }
+    .chip:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* ── Card ────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 18px 20px;
+      align-self: flex-start;
+      max-width: 88%;
+      border-left: 3px solid var(--card-accent);
+      box-shadow: var(--shadow-md);
+      animation: slide-in 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.63rem;
+      letter-spacing: 0.10em;
+      color: var(--action);
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .card-title {
+      font-size: 0.97rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .card-preview {
+      width: 100%;
+      height: auto;
+      border-radius: 7px;
+      margin-bottom: 12px;
+      display: block;
+      border: 1px solid var(--border);
+    }
+
+    .card-resumen {
+      font-size: 0.86rem;
+      color: var(--text-dim);
+      line-height: 1.68;
+      margin-bottom: 14px;
+    }
+
+    .card-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--action-dim);
+      color: var(--action);
+      text-decoration: none;
+      padding: 6px 13px;
+      border-radius: 6px;
+      font-size: 0.81rem;
+      font-weight: 500;
+      border: 1px solid rgba(30, 84, 208, 0.20);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .card-link:hover {
+      background: var(--action);
+      border-color: var(--action);
+      color: #FFFFFF;
+    }
+
+    /* ── Input ───────────────────────────────────────────── */
+    .input-area {
+      display: flex;
+      gap: 10px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -2px 8px rgba(13,24,52,0.06);
+    }
+
+    #userInput {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 15px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.91rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    #userInput::placeholder { color: var(--text-muted); }
+    #userInput:focus {
+      border-color: var(--action);
+      box-shadow: 0 0 0 3px rgba(30, 84, 208, 0.12);
+    }
+
+    #sendBtn {
+      background: var(--action);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      width: 42px;
+      height: 42px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, box-shadow 0.15s;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(30, 84, 208, 0.35);
+    }
+    #sendBtn:hover {
+      background: var(--action-hover);
+      box-shadow: 0 3px 10px rgba(30, 84, 208, 0.45);
+    }
+
+    @media (max-width: 480px) {
+      .bubble { max-width: 91%; font-size: 0.88rem; }
+      .card   { max-width: 96%; }
+      .chip   { font-size: 0.8rem; padding: 5px 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-logo">
+    <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 1.5L2.5 4.5V9C2.5 12.75 5.3 16.28 9 17.25C12.7 16.28 15.5 12.75 15.5 9V4.5L9 1.5Z" fill="white" fill-opacity="0.9"/>
+      <path d="M6.5 9L8.5 11L12 7" stroke="#0D1834" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="header-info">
+    <span class="header-title">CECOM-bot</span>
+    <span class="header-subtitle">Capacitación</span>
+  </div>
+  <div class="header-status">
+    <span class="status-dot"></span>
+  </div>
+  <button id="btnInicio">↩ Inicio</button>
+</header>
+
+<div class="chat-container">
+  <div id="messages"></div>
+  <div class="input-area">
+    <input id="userInput" type="text" placeholder="Escribe tu DNI o mensaje..." autocomplete="off" />
+    <button id="sendBtn" title="Enviar">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M2 8L14 8M14 8L9 3M14 8L9 13" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  const socket    = io();
+  const messagesEl = document.getElementById("messages");
+  const userInput  = document.getElementById("userInput");
+  const sendBtn    = document.getElementById("sendBtn");
+  const btnInicio  = document.getElementById("btnInicio");
+
+  const ETAPAS_SIN_INICIO = new Set(["pedir_dni"]);
+
+  socket.on("stage", (etapa) => {
+    btnInicio.style.display = ETAPAS_SIN_INICIO.has(etapa) ? "none" : "inline-block";
+  });
+
+  btnInicio.addEventListener("click", () => {
+    clearButtons();
+    addBubble("↩ Inicio", "user");
+    socket.emit("message", "volver_menu");
+  });
+
+  /* ── Typing indicator ── */
+  let typingEl = null;
+
+  function showTyping() {
+    if (typingEl) return;
+    typingEl = document.createElement("div");
+    typingEl.className = "typing-indicator";
+    typingEl.innerHTML = "<span></span><span></span><span></span>";
+    messagesEl.appendChild(typingEl);
+    scrollBottom();
+  }
+
+  function hideTyping() {
+    if (typingEl) { typingEl.remove(); typingEl = null; }
+  }
+
+  function scrollBottom() {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function addBubble(text, who) {
+    hideTyping();
+    const div = document.createElement("div");
+    div.className = `bubble ${who}`;
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    scrollBottom();
+  }
+
+  function clearButtons() {
+    document.querySelectorAll(".buttons-row").forEach(el => el.remove());
+  }
+
+  function addButtons(buttons) {
+    hideTyping();
+    clearButtons();
+    const row = document.createElement("div");
+    row.className = "buttons-row";
+    buttons.forEach(btn => {
+      const chip = document.createElement("button");
+      chip.className = "chip";
+      chip.textContent = btn.label;
+      chip.addEventListener("click", () => {
+        clearButtons();
+        addBubble(btn.label, "user");
+        socket.emit("message", btn.value);
+        showTyping();
+      });
+      row.appendChild(chip);
+    });
+    messagesEl.appendChild(row);
+    scrollBottom();
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function formatResumen(text) {
+    return escHtml(text).replace(/\n/g, '<br>');
+  }
+
+  function addCard(modulo) {
+    hideTyping();
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const previewHtml = modulo.preview
+      ? `<img class="card-preview" src="${escHtml(modulo.preview)}" alt="${escHtml(modulo.nombre)}">`
+      : '';
+
+    const links = [];
+    if (modulo.pdf)   links.push(`<a class="card-link" href="${escHtml(modulo.pdf)}"   target="_blank" rel="noopener">📄 Ver PDF</a>`);
+    if (modulo.video) links.push(`<a class="card-link" href="${escHtml(modulo.video)}" target="_blank" rel="noopener">▶ Ver Video</a>`);
+    const linksHtml = links.length ? `<div class="card-links">${links.join('')}</div>` : '';
+
+    card.innerHTML = `
+      <div class="card-badge">◈ módulo</div>
+      <div class="card-title">${escHtml(modulo.nombre)}</div>
+      ${previewHtml}
+      <div class="card-resumen">${formatResumen(modulo.resumen)}</div>
+      ${linksHtml}
+    `;
+    messagesEl.appendChild(card);
+    scrollBottom();
+  }
+
+  socket.on("response", (data) => { addBubble(data, "bot"); });
+  socket.on("buttons",  (data) => { addButtons(data); });
+  socket.on("card",     (data) => { addCard(data); });
+
+  function enviarMensaje() {
+    const texto = userInput.value.trim();
+    if (!texto) return;
+    clearButtons();
+    addBubble(texto, "user");
+    socket.emit("message", texto);
+    userInput.value = "";
+    showTyping();
+  }
+
+  sendBtn.addEventListener("click", enviarMensaje);
+  userInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") enviarMensaje();
+  });
+</script>
+</body>
+</html>
