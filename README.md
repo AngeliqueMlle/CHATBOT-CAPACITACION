@@ -1,6 +1,6 @@
-# CECOM Chatbot de Capacitación
+# Chatbot de Capacitación
 
-Chatbot institucional del Centro de Comunicaciones Municipal (CECOM).
+Chatbot institucional del Centro de Comunicaciones (CECOM).
 Capacita al personal municipal en las herramientas tecnológicas de su trabajo diario.
 
 ## Stack
