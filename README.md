@@ -10,6 +10,7 @@ Capacita al personal en las herramientas tecnológicas de su trabajo diario medi
 - **Bienvenida personalizada por IA** — saludo motivador para usuarios nuevos; muestra fecha de último acceso para recurrentes
 - **Conversación mixta** — navega por botones o texto libre en cualquier etapa
 - **14 módulos de capacitación** — 12 plataformas + 2 dispositivos
+- **Memoria contextual por sesión** — el agente recuerda el hilo de preguntas durante la conversación; se reinicia al cerrar el chat
 - **RAG sobre manuales PDF** — responde dudas usando únicamente el contenido del módulo, sin inventar información
 - **Quiz opcional** — 2 preguntas por módulo con feedback inmediato por respuesta
 - **Registro de actividad** — guarda por DNI: módulo visto, categoría, fecha, resultado del quiz
@@ -27,6 +28,15 @@ Capacita al personal en las herramientas tecnológicas de su trabajo diario medi
 | PDF processing | Claude Vision (Anthropic) via `procesar_pdf.py` |
 | Base de datos | PostgreSQL · psycopg2 |
 | Frontend | HTML · CSS · JS vanilla · Socket.IO client |
+
+---
+
+## Requisitos previos
+
+- **Python 3.10+**
+- **PostgreSQL** con extensión [pgvector](https://github.com/pgvector/pgvector) instalada
+- **Poppler** — necesario para ingestar PDFs. Verificar con `pdftoppm -v`.
+  Si no está instalado, descargarlo desde [poppler-windows](https://github.com/oschwartz10612/poppler-windows/releases) y agregarlo al PATH del sistema.
 
 ---
 
