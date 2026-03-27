@@ -1,51 +1,69 @@
-# Chatbot de Capacitación
+# CECOM-BOT — Chatbot de Capacitación
 
-Chatbot institucional del Centro de Comunicaciones (CECOM).
-Capacita al personal municipal en las herramientas tecnológicas de su trabajo diario.
+Asistente institucional del Centro de Comunicaciones Municipal (CECOM).
+Capacita al personal en las herramientas tecnológicas de su trabajo diario mediante conversación guiada, RAG sobre manuales PDF y quizzes por módulo.
+
+---
+
+## Características
+
+- **Bienvenida personalizada por IA** — saludo motivador para usuarios nuevos; muestra fecha de último acceso para recurrentes
+- **Conversación mixta** — navega por botones o texto libre en cualquier etapa
+- **14 módulos de capacitación** — 12 plataformas + 2 dispositivos
+- **RAG sobre manuales PDF** — responde dudas usando únicamente el contenido del módulo, sin inventar información
+- **Quiz opcional** — 2 preguntas por módulo con feedback inmediato por respuesta
+- **Registro de actividad** — guarda por DNI: módulo visto, categoría, fecha, resultado del quiz
+- **Botón Inicio** — visible en el header durante toda la sesión para volver al menú sin perder el DNI
+
+---
 
 ## Stack
 
-- Python 3.10 · FastAPI · python-socketio
-- LangChain · Groq llama-3.3-70b · Mistral fallback automático
-- PostgreSQL · psycopg2
-- HTML/JS/CSS puro (sin frameworks)
+| Capa | Tecnología |
+|---|---|
+| Backend | Python 3.10 · FastAPI · python-socketio (ASGI) |
+| IA | LangChain · Groq `llama-3.3-70b` · Mistral (fallback automático) |
+| RAG | pgvector · LangChain PGVector · HuggingFace `paraphrase-multilingual-MiniLM-L12-v2` |
+| PDF processing | Claude Vision (Anthropic) via `procesar_pdf.py` |
+| Base de datos | PostgreSQL · psycopg2 |
+| Frontend | HTML · CSS · JS vanilla · Socket.IO client |
 
 ---
 
 ## Instalación
 
-### 1. Instalar dependencias
+**1. Dependencias**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Configurar variables de entorno
+**2. Variables de entorno**
 
 ```bash
 cp .env.example .env
 ```
 
-Editar `.env` con tus credenciales reales:
+Completar `.env`:
 
 ```env
-GROQ_API_KEY=tu_api_key_de_groq
-MISTRAL_API_KEY=tu_api_key_de_mistral
+GROQ_API_KEY=
+MISTRAL_API_KEY=
+ANTHROPIC_API_KEY=        # para procesar_pdf.py (Claude Vision)
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=cecom_chatbot
-DB_USER=tu_usuario_postgres
-DB_PASSWORD=tu_password_postgres
+DB_USER=
+DB_PASSWORD=
 ```
 
-### 3. Crear la base de datos en PostgreSQL
-
-Ejecutar en pgAdmin o psql:
+**3. Base de datos**
 
 ```sql
 CREATE DATABASE cecom_chatbot;
-
 \c cecom_chatbot
+
+CREATE EXTENSION IF NOT EXISTS vector;
 
 CREATE TABLE IF NOT EXISTS usuarios (
     dni VARCHAR(8) PRIMARY KEY,
@@ -64,19 +82,23 @@ CREATE TABLE IF NOT EXISTS actividad (
 );
 ```
 
-### 4. Iniciar el servidor
+**4. Iniciar servidor**
 
 ```bash
 uvicorn main:socket_app --reload --port 8000
 ```
 
-> **Nota:** El comando usa `main:socket_app`, no `main:app`.
+Acceder en `http://localhost:8000`
 
-### 5. Abrir en el navegador
+---
 
+## Ingestar un PDF
+
+```bash
+python procesar_pdf.py "Nombre del Módulo" ruta/al/manual.pdf
 ```
-http://localhost:8000
-```
+
+El tipo de módulo se detecta automáticamente desde `modules.py`. Genera un `.txt` de respaldo para no re-llamar a la API si el proceso se interrumpe. Una vez procesado, actualizar el campo `pdf` del módulo en `modules.py` con la ruta `/static/modulos/{slug}/manual.pdf`.
 
 ---
 
@@ -88,30 +110,44 @@ pytest tests/ -v
 
 ---
 
-## Estructura del proyecto
+## Estructura
 
 ```
 chatbot-capacitacion/
-├── main.py          # Servidor FastAPI + SocketIO
-├── chain.py         # Máquina de estados y lógica conversacional
-├── database.py      # Conexión y operaciones PostgreSQL
-├── modules.py       # 14 módulos de capacitación
-├── quizzes.json     # 2 preguntas por módulo
-├── chat.html        # Interfaz web
+├── main.py              # FastAPI + Socket.IO
+├── chain.py             # Máquina de estados conversacional
+├── rag.py               # Búsqueda y carga de chunks (pgvector)
+├── database.py          # Operaciones PostgreSQL
+├── modules.py           # 14 módulos de capacitación
+├── procesar_pdf.py      # CLI de ingesta PDF → pgvector
+├── quizzes.json         # 2 preguntas por módulo
+├── chat.html            # Interfaz web
+├── static/modulos/      # PDFs, videos y previews por módulo
 ├── requirements.txt
 ├── .env.example
 └── tests/
-    ├── test_database.py   # 6 tests (psycopg2 mockeado)
-    └── test_chain.py      # 15 tests (máquina de estados)
+    ├── test_chain.py        # 15 tests — máquina de estados
+    ├── test_database.py     # 6 tests — operaciones DB
+    └── test_rag.py          # RAG (búsqueda y chunks)
 ```
 
 ---
 
-## Flujo del chatbot
+## Flujo conversacional
 
-1. Usuario ingresa su DNI (8 dígitos)
-2. **Nuevo usuario** → bienvenida personalizada generada por IA
-3. **Usuario existente** → muestra fecha del último acceso
-4. Menú principal: **Capacitarme** / **Tengo una duda**
-5. **Capacitarme** → elige categoría → módulo → tarjeta con PDF y video → quiz opcional (2 preguntas)
-6. **Tengo una duda** → pregunta libre → respuesta de IA → vuelve al menú
+```
+Ingreso DNI
+    └── Bienvenida personalizada (IA)
+         │
+         ├── Capacitarme
+         │    └── Elegir categoría (Plataformas / Dispositivos)
+         │         └── Elegir módulo
+         │              └── Tarjeta: resumen + PDF + video
+         │                   ├── Duda sobre el módulo → respuesta RAG → nueva duda o continuar
+         │                   └── Quiz opcional (2 preguntas con feedback)
+         │                        └── ¿Ver otro módulo / Volver al menú / Salir?
+         │
+         └── Tengo una duda
+              └── 3 sugerencias clicables + campo libre
+                   └── Respuesta RAG → vuelve al menú
+```
