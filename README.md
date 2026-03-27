@@ -94,11 +94,25 @@ Acceder en `http://localhost:8000`
 
 ## Ingestar un PDF
 
+> `static/` no está en el repositorio. Antes de ingestar, crear manualmente la carpeta del módulo:
+> ```
+> static/modulos/{slug}/
+> ```
+
+Colocar el PDF dentro y ejecutar:
+
 ```bash
-python procesar_pdf.py "Nombre del Módulo" ruta/al/manual.pdf
+python procesar_pdf.py "Nombre del Módulo" static/modulos/{slug}/manual.pdf
 ```
 
-El tipo de módulo se detecta automáticamente desde `modules.py`. Genera un `.txt` de respaldo para no re-llamar a la API si el proceso se interrumpe. Una vez procesado, actualizar el campo `pdf` del módulo en `modules.py` con la ruta `/static/modulos/{slug}/manual.pdf`.
+El tipo de módulo se detecta automáticamente desde `modules.py`. Genera un `{Nombre_Modulo}_texto.txt` en la misma carpeta como respaldo — si el proceso se interrumpe, en la siguiente ejecución reutiliza ese archivo sin volver a llamar a la API.
+
+Una vez procesado, actualizar los campos del módulo en `modules.py`:
+
+```python
+"pdf":     "/static/modulos/{slug}/manual.pdf",
+"preview": "/static/modulos/{slug}/preview.jpg", # o None
+```
 
 ---
 
