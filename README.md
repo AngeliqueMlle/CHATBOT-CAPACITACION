@@ -1,78 +1,58 @@
-# CECOM-BOT — Chatbot de Capacitación
+# CECOM-BOT
 
-Asistente institucional del Centro de Comunicaciones Municipal (CECOM).
-Capacita al personal en las herramientas tecnológicas de su trabajo diario mediante conversación guiada, RAG sobre manuales PDF y quizzes por módulo.
+Chatbot de capacitación para el personal de la Central de Comunicación y Videovigilancia (CECOM) de la Municipalidad de San Juan de Lurigancho. El chatbot Enseña a usar las plataformas y dispositivos que suele manejar diariamente, responde dudas sobre los manuales y toma un quiz corto al final de cada módulo.
 
----
+El personal trabaja con 12 plataformas y dispositivos distintos, y la capacitación dependía de que alguien con experiencia se sentara al lado del nuevo a explicarle. Los manuales existían en PDF pero nadie los leía completos, y si querías saber una cosa puntual tenías que buscarla tú mismo. La idea fue que cada quien pueda capacitarse a su ritmo y preguntar lo que no entiende sin depender de que haya alguien disponible.
 
-## Características
+## Qué hace
 
-- **Bienvenida personalizada por IA** — saludo motivador para usuarios nuevos; muestra fecha de último acceso para recurrentes
-- **Conversación mixta** — navega por botones o texto libre en cualquier etapa
-- **14 módulos de capacitación** — 12 plataformas + 2 dispositivos
-- **Memoria contextual por sesión** — el agente recuerda el hilo de preguntas durante la conversación; se reinicia al cerrar el chat
-- **RAG sobre manuales PDF** — responde dudas usando únicamente el contenido del módulo, sin inventar información
-- **Quiz opcional** — 2 preguntas por módulo con feedback inmediato por respuesta
-- **Registro de actividad** — guarda por DNI: módulo visto, categoría, fecha, resultado del quiz
-- **Botón Inicio** — visible en el header durante toda la sesión para volver al menú sin perder el DNI
+Entras con tu DNI y eliges una categoría (plataforma o dispositivo) , y de ahí el módulo que quieras. Cada módulo abre con un resumen, el PDF y el video si tuviera.
 
----
+Si tienes una duda la escribes y el bot responde usando solo el contenido de ese manual, no inventa. Recuerda el hilo de la conversación mientras no cierres el chat. Al final puedes dar un quiz de dos preguntas con feedback por cada respuesta.
 
-## Stack
+Todo queda registrado por DNI: qué módulo vio, de qué categoría, cuándo y qué sacó en el quiz. Puedes navegar por botones o escribiendo, como prefieras.
 
-| Capa | Tecnología |
-|---|---|
-| Backend | Python 3.10 · FastAPI · python-socketio (ASGI) |
-| IA | LangChain · Groq `llama-3.3-70b` · Mistral (fallback automático) |
-| RAG | pgvector · LangChain PGVector · HuggingFace `paraphrase-multilingual-MiniLM-L12-v2` |
-| PDF processing | Claude Vision (Anthropic) via `procesar_pdf.py` |
-| Base de datos | PostgreSQL · psycopg2 |
-| Frontend | HTML · CSS · JS vanilla · Socket.IO client |
+```
+Ingreso DNI
+    └── Bienvenida personalizada (IA)
+         │
+         ├── Capacitarme
+         │    └── Elegir categoría (Plataformas / Dispositivos)
+         │         └── Elegir módulo
+         │              └── Tarjeta: resumen + PDF + video
+         │                   ├── Duda sobre el módulo → respuesta RAG → nueva duda o continuar
+         │                   └── Quiz opcional (2 preguntas con feedback)
+         │                        └── ¿Ver otro módulo / Volver al menú / Salir?
+         │
+         └── Tengo una duda
+```
 
----
+## Cómo funciona
 
-## Requisitos previos
+El backend es FastAPI con Socket.IO para el chat en tiempo real. La conversación está armada como máquina de estados en `chain.py`.
 
-- **Python 3.10+**
-- **PostgreSQL** con extensión [pgvector](https://github.com/pgvector/pgvector) instalada
-- **Poppler** — necesario para ingestar PDFs. Verificar con `pdftoppm -v`.
-  Si no está instalado, descargarlo desde [poppler-windows](https://github.com/oschwartz10612/poppler-windows/releases) y agregarlo al PATH del sistema.
+Los manuales en PDF se procesan con Claude Vision, se parten en chunks y se guardan como embeddings en PostgreSQL con pgvector. Cuando alguien pregunta algo, se busca en los chunks de ese módulo y la respuesta sale de ahí. El modelo es llama-3.3-70b por Groq, con Mistral de respaldo si falla.
 
----
+Hay tests para la máquina de estados, las operaciones de base de datos y el RAG.
 
-## Instalación
+**Stack:** Python, FastAPI, Socket.IO, LangChain, PostgreSQL, pgvector, HuggingFace embeddings, HTML/CSS/JS.
 
-**1. Dependencias**
+## Instalar
+
+Necesitas Python 3.10+, PostgreSQL con la extensión pgvector, y Poppler en el PATH para procesar los PDFs (`pdftoppm -v` para verificar).
 
 ```bash
 pip install -r requirements.txt
-```
-
-**2. Variables de entorno**
-
-```bash
 cp .env.example .env
 ```
 
-Completar `.env`:
+En `.env` van las llaves de Groq, Mistral y Anthropic, más los datos de conexión a Postgres.
 
-```env
-GROQ_API_KEY=
-MISTRAL_API_KEY=
-ANTHROPIC_API_KEY=        # para procesar_pdf.py (Claude Vision)
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=cecom_chatbot
-DB_USER=
-DB_PASSWORD=
-```
-
-**3. Base de datos**
+Crear la base y las tablas:
 
 ```sql
 CREATE DATABASE cecom_chatbot;
 \c cecom_chatbot
-
 CREATE EXTENSION IF NOT EXISTS vector;
 
 CREATE TABLE IF NOT EXISTS usuarios (
@@ -92,86 +72,14 @@ CREATE TABLE IF NOT EXISTS actividad (
 );
 ```
 
-**4. Iniciar servidor**
+Levantar el servidor:
 
 ```bash
 uvicorn main:socket_app --reload --port 8000
 ```
 
-Acceder en `http://localhost:8000`
+Entra en `http://localhost:8000`.
 
----
+## Agregar un módulo
 
-## Ingestar un PDF
-
-> `static/` no está en el repositorio. Antes de ingestar, crear manualmente la carpeta del módulo:
-> ```
-> static/modulos/{slug}/
-> ```
-
-Colocar el PDF dentro y ejecutar:
-
-```bash
-python procesar_pdf.py "Nombre del Módulo" static/modulos/{slug}/manual.pdf
-```
-
-El tipo de módulo se detecta automáticamente desde `modules.py`. Genera un `{Nombre_Modulo}_texto.txt` en la misma carpeta como respaldo — si el proceso se interrumpe, en la siguiente ejecución reutiliza ese archivo sin volver a llamar a la API.
-
-Una vez procesado, actualizar los campos del módulo en `modules.py`:
-
-```python
-"pdf":     "/static/modulos/{slug}/manual.pdf",
-"preview": "/static/modulos/{slug}/preview.jpg", # o None
-```
-
----
-
-## Tests
-
-```bash
-pytest tests/ -v
-```
-
----
-
-## Estructura
-
-```
-chatbot-capacitacion/
-├── main.py              # FastAPI + Socket.IO
-├── chain.py             # Máquina de estados conversacional
-├── rag.py               # Búsqueda y carga de chunks (pgvector)
-├── database.py          # Operaciones PostgreSQL
-├── modules.py           # 14 módulos de capacitación
-├── procesar_pdf.py      # CLI de ingesta PDF → pgvector
-├── quizzes.json         # 2 preguntas por módulo
-├── chat.html            # Interfaz web
-├── static/modulos/      # PDFs, videos y previews por módulo
-├── requirements.txt
-├── .env.example
-└── tests/
-    ├── test_chain.py        # 15 tests — máquina de estados
-    ├── test_database.py     # 6 tests — operaciones DB
-    └── test_rag.py          # RAG (búsqueda y chunks)
-```
-
----
-
-## Flujo conversacional
-
-```
-Ingreso DNI
-    └── Bienvenida personalizada (IA)
-         │
-         ├── Capacitarme
-         │    └── Elegir categoría (Plataformas / Dispositivos)
-         │         └── Elegir módulo
-         │              └── Tarjeta: resumen + PDF + video
-         │                   ├── Duda sobre el módulo → respuesta RAG → nueva duda o continuar
-         │                   └── Quiz opcional (2 preguntas con feedback)
-         │                        └── ¿Ver otro módulo / Volver al menú / Salir?
-         │
-         └── Tengo una duda
-              └── 3 sugerencias clicables + campo libre
-                   └── Respuesta RAG → vuelve al menú
-```
+La carpeta `static/modulos/{slug}` no está en el repo, así que primero hay que crearla:
